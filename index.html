@@ -1067,6 +1067,8 @@ Kelly’s restraint can look effortless, but it places unusual responsibility on
       var speechQueue = [];
       var queueIndex = 0;
       var playing = false;
+      var pauseTimer = null;
+      var wakeLock = null;
 
       if (!Number.isFinite(current) || current < 0 || current >= tracks.length) current = 0;
       if (!Number.isFinite(spokenIndex) || spokenIndex < 0) spokenIndex = 0;
@@ -1101,7 +1103,7 @@ Kelly’s restraint can look effortless, but it places unusual responsibility on
         guideTitle.innerHTML = guide.title;
         guideMeta.textContent = guide.meta;
         sources.innerHTML = guide.sources;
-        support.textContent = "Press play once and the guide continues through all " + tracks.length + " stops. Audio uses the voice built into your phone. Keep this page open while listening; progress is remembered on this device.";
+        support.textContent = "Press play once and the guide continues through all " + tracks.length + " stops. The guide will try to keep your screen awake during playback so the browser voice is not interrupted. This uses more battery. Progress is remembered on this device.";
         root.querySelectorAll(".gallery-choice").forEach(function (button) {
           button.setAttribute("aria-current", button.getAttribute("data-guide") === guideId ? "true" : "false");
         });
@@ -1121,6 +1123,9 @@ Kelly’s restraint can look effortless, but it places unusual responsibility on
 
       function stopSpeech(savePosition) {
         if (window.speechSynthesis) window.speechSynthesis.cancel();
+        if (pauseTimer) window.clearTimeout(pauseTimer);
+        pauseTimer = null;
+        releaseWakeLock();
         playing = false;
         utterance = null;
         iconButton(play, "play", spokenIndex > 0 ? "Resume guide" : "Play guide");
@@ -1145,6 +1150,7 @@ Kelly’s restraint can look effortless, but it places unusual responsibility on
         speechQueue = makeSpeechQueue(track.text, spokenIndex);
         queueIndex = 0;
         playing = true;
+        requestWakeLock();
         iconButton(play, "pause", "Pause");
         status.textContent = "Playing";
         speakQueuedChunk();
@@ -1158,14 +1164,20 @@ Kelly’s restraint can look effortless, but it places unusual responsibility on
           var size = Math.min(620, remaining);
           if (remaining > 620) {
             var sample = fullText.slice(cursor, cursor + 620);
-            var sentenceBreak = Math.max(sample.lastIndexOf(". "), sample.lastIndexOf("? "), sample.lastIndexOf("! "), sample.lastIndexOf("\n\n"));
-            if (sentenceBreak > 260) size = sentenceBreak + 1;
+            var paragraphBreak = sample.indexOf("\n\n");
+            if (paragraphBreak > 80) size = paragraphBreak;
+            var sentenceBreak = Math.max(sample.lastIndexOf(". "), sample.lastIndexOf("? "), sample.lastIndexOf("! "));
+            if (paragraphBreak <= 80 && sentenceBreak > 260) size = sentenceBreak + 1;
             else {
               var wordBreak = sample.lastIndexOf(" ");
-              if (wordBreak > 260) size = wordBreak;
+              if (paragraphBreak <= 80 && sentenceBreak <= 260 && wordBreak > 260) size = wordBreak;
             }
           }
-          chunks.push({ start: cursor, end: cursor + size, text: fullText.slice(cursor, cursor + size) });
+          var chunkText = fullText.slice(cursor, cursor + size);
+          var after = fullText.slice(cursor + size, cursor + size + 2);
+          var paragraphPause = after === "\n\n";
+          var movementPause = chunks.length === 0 && /^(now |find |move |look for |stand |enter |pause )/i.test(chunkText.trim());
+          chunks.push({ start: cursor, end: cursor + size, text: chunkText, pauseAfter: movementPause ? 3500 : (paragraphPause ? 1100 : 250) });
           cursor += size;
           while (cursor < fullText.length && /\s/.test(fullText.charAt(cursor))) cursor += 1;
         }
@@ -1193,6 +1205,7 @@ Kelly’s restraint can look effortless, but it places unusual responsibility on
             }, 900);
           } else {
             playing = false;
+            releaseWakeLock();
             spokenIndex = 0;
             localStorage.setItem("museumGuideChar-" + guideId, "0");
             status.textContent = "Finished";
@@ -1216,7 +1229,11 @@ Kelly’s restraint can look effortless, but it places unusual responsibility on
           spokenIndex = chunk.end;
           updateProgress(track);
           queueIndex += 1;
-          speakQueuedChunk();
+          status.textContent = chunk.pauseAfter >= 3000 ? "Pause — find the artwork" : "Playing";
+          pauseTimer = window.setTimeout(function () {
+            pauseTimer = null;
+            if (playing) speakQueuedChunk();
+          }, chunk.pauseAfter);
         };
         utterance.onerror = function (event) {
           if (event.error !== "canceled" && event.error !== "interrupted") status.textContent = "Playback stopped";
@@ -1225,6 +1242,25 @@ Kelly’s restraint can look effortless, but it places unusual responsibility on
         };
         window.speechSynthesis.speak(utterance);
       }
+
+      async function requestWakeLock() {
+        if (!("wakeLock" in navigator) || document.visibilityState !== "visible") return;
+        try {
+          wakeLock = await navigator.wakeLock.request("screen");
+        } catch (error) {
+          wakeLock = null;
+        }
+      }
+
+      function releaseWakeLock() {
+        if (!wakeLock) return;
+        wakeLock.release().catch(function () {});
+        wakeLock = null;
+      }
+
+      document.addEventListener("visibilitychange", function () {
+        if (playing && document.visibilityState === "visible" && !wakeLock) requestWakeLock();
+      });
 
       function selectTrack(index, autoPlay) {
         stopSpeech(false);
