@@ -690,13 +690,16 @@ svg {
 </style>
 </head>
 <body>
-<section id="twombly-guide" aria-label="Gallery 185 audio guide">
+<section id="twombly-guide" aria-label="Philadelphia Museum of Art audio guide">
   <style>
     #twombly-guide { color: var(--foreground); }
     #twombly-guide .guide-head { display: grid; gap: 0.35rem; margin-bottom: 1rem; }
     #twombly-guide .eyebrow { color: var(--muted-foreground); letter-spacing: 0.06em; text-transform: uppercase; }
     #twombly-guide .guide-head h2 { margin: 0; }
     #twombly-guide .guide-head p { margin: 0; color: var(--muted-foreground); }
+    #twombly-guide .gallery-switcher { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; margin-bottom: 1rem; }
+    #twombly-guide .gallery-choice { min-height: 3.5rem; white-space: normal; line-height: 1.25; }
+    #twombly-guide .gallery-choice[aria-current="true"] { background: var(--primary); color: var(--primary-foreground); }
     #twombly-guide .now-playing { display: grid; gap: 0.8rem; margin-bottom: 1rem; }
     #twombly-guide .now-meta { display: grid; gap: 0.25rem; }
     #twombly-guide .now-meta h3 { margin: 0; }
@@ -729,6 +732,7 @@ svg {
     #twombly-guide .source-list { display: grid; gap: 0.5rem; margin-top: 0.8rem; padding-left: 1.2rem; }
     #twombly-guide .support-note { margin-top: 0.8rem; color: var(--muted-foreground); }
     @media (max-width: 520px) {
+      #twombly-guide .gallery-switcher { grid-template-columns: 1fr; }
       #twombly-guide .transport { display: grid; grid-template-columns: repeat(3, 1fr); }
       #twombly-guide .transport .btn { justify-content: center; }
       #twombly-guide .primary-play { grid-column: 1 / -1; width: 100%; }
@@ -738,10 +742,15 @@ svg {
     }
   </style>
 
+  <nav class="gallery-switcher" aria-label="Choose a gallery">
+    <button type="button" class="btn gallery-choice" data-guide="twombly" aria-current="true">Cy Twombly · <em>Fifty Days at Iliam</em></button>
+    <button type="button" class="btn gallery-choice" data-guide="kelly" aria-current="false">Ellsworth Kelly · Gallery 275</button>
+  </nav>
+
   <header class="guide-head">
-    <div class="eyebrow text-small">Philadelphia Museum of Art · Gallery 185</div>
-    <h2><em>Fifty Days at Iliam</em></h2>
-    <p>Cy Twombly, 1978 · Six stops · About 13 minutes</p>
+    <div id="tg-eyebrow" class="eyebrow text-small">Philadelphia Museum of Art · Modern &amp; Contemporary Art</div>
+    <h2 id="tg-guide-title"><em>Fifty Days at Iliam</em></h2>
+    <p id="tg-guide-meta">Cy Twombly, 1978 · Six stops · About 13 minutes</p>
   </header>
 
   <div class="card now-playing" aria-live="polite">
@@ -785,7 +794,7 @@ svg {
 
   <details>
     <summary>Sources and quoted passages</summary>
-    <ul class="source-list text-small">
+    <ul id="tg-sources" class="source-list text-small">
       <li><a href="https://www.philamuseum.org/objects/85709" target="_blank" rel="noreferrer">Philadelphia Museum of Art collection record</a> and exhibition texts for <em>Fifty Days at Iliam</em>.</li>
       <li>Homer, <a href="https://www.gutenberg.org/files/6130/6130-h/6130-h.htm" target="_blank" rel="noreferrer"><em>The Iliad</em>, translated by Alexander Pope</a>, 1715–1720. Public domain.</li>
       <li>Cy Twombly, statement published in <em>L’Esperienza moderna</em>, 1957, as reproduced by the <a href="https://cytwombly.org/news/exhibitions/cy-twombly-at-gagosian-new-york/" target="_blank" rel="noreferrer">Cy Twombly Foundation</a>.</li>
@@ -795,12 +804,12 @@ svg {
     </ul>
   </details>
 
-  <p class="support-note text-small">Press play once and the guide continues through all six stops. Audio uses the voice built into your phone. Keep this page open while listening; progress is remembered on this device.</p>
+  <p id="tg-support" class="support-note text-small">Press play once and the guide continues through all six stops. Audio uses the voice built into your phone. Keep this page open while listening; progress is remembered on this device.</p>
 
   <script>
     (function () {
       var root = document.getElementById("twombly-guide");
-      var tracks = [
+      var twomblyTracks = [
         {
           title: "At the threshold",
           cue: "Pause just before entering the room.",
@@ -937,6 +946,101 @@ When you are ready, leave the room without replaying anything. The best test of 
         }
       ];
 
+      var kellyTracks = [
+        {
+          title: "Before the geometry",
+          cue: "Pause at the entrance to Gallery 275 and take in the room.",
+          minutes: "3 min",
+          text: `Before attaching a movement to Ellsworth Kelly, look around. The paintings may resemble pristine geometry: hard edges, flat colour, very little visible brushwork. It is tempting to call this Minimalism and move on. That is useful only up to a point.
+
+Kelly was born in 1923 and served in the United States Army during the Second World War. From 1948 to 1954 he lived in Paris. American painting was then becoming famous for the emotionally charged gestures of Abstract Expressionists such as Jackson Pollock. Kelly went in almost the opposite direction. He tried to remove personal expression and traditional composition, but he did not begin with abstract geometry in his head. He began by noticing shapes already present in the world: the frame of a window, a shadow on a staircase, the curve of a leaf, light broken across water.
+
+Recalling this breakthrough, Kelly said: “Everywhere I looked, everything I saw became something to be made.”
+
+That sentence is the key to this room. Kelly was not depicting a window or a leaf in the conventional sense. He isolated a shape or pattern from what he saw, detached it from its original setting, and made it into an independent object. He called such discoveries “already made.”
+
+This also explains why he does not fit neatly into Minimalism, a movement that emerged later in the 1960s. Kelly shared its economy of form and impersonal surfaces, and his work helped make it possible. But his sources were often sensuous, observational, and specific. He also developed his approach before the movement had a name.
+
+Gallery 275 is permanently devoted to Kelly. The museum worked with him during his lifetime to choose works that could explain the origins of his art. Do not rush to identify what every shape represents. First notice what the room does to your body: the scale of each panel, the intervals between works, and the portions of bare wall that suddenly seem active.`
+        },
+        {
+          title: "Seaweed: finding a shape",
+          cue: "Find Seaweed, or another small early work derived from nature.",
+          minutes: "2 min",
+          text: `Look for Seaweed, made in 1949. If it is not currently on view, use the nearest small early work in this gallery and listen for the method rather than a perfect match.
+
+In France, Kelly collected pieces of seaweed and plants. He sometimes pressed them, drew them, or used their outlines. The important change is that he did not treat nature as scenery. A single irregular contour could become the entire subject.
+
+Seaweed sits at an interesting boundary. It may begin with a recognisable organic fragment, but Kelly asks you to stop reading it as botanical information. Attend instead to the lobes, gaps, asymmetry, and the tension between the shape and the area around it.
+
+The Philadelphia Museum describes Kelly as discovering forms in both nature and the built environment. The Barnes Foundation puts it neatly: his abstractions come from “natural and man-made environments.” That distinction matters. A plant edge and an architectural edge could be equally valuable to him.
+
+Try a small experiment. Look at the work, then at the empty wall immediately beside it. Kelly makes negative space feel designed even when he did not paint it. The artwork is not merely the coloured or drawn shape. It is the relationship between that shape, its support, and the room.`
+        },
+        {
+          title: "Seine: water without a picture",
+          cue: "Find Seine, 1951, or the nearest gridded black-and-white work.",
+          minutes: "2 min",
+          text: `Now find Seine, made in 1951. From a distance it may look like a black-and-white grid. Up close, the rectangles vary. There is no horizon, riverbank, boat, or reflection painted in the usual way.
+
+Kelly arrived at the pattern by watching light flicker on the River Seine. He converted a changing optical event into a field of dark and light units. The result is not a picture of the river so much as a visual equivalent for its instability.
+
+The grid connects Kelly to European modernists such as Piet Mondrian, while the irregular distribution reflects his interest in chance. In Paris he encountered the work of Jean Arp and Sophie Taeuber-Arp, and later knew the composer John Cage, all artists who allowed systems and chance operations to loosen personal control.
+
+Let your eyes move across the work without trying to find a focal point. Does the pattern seem to shimmer, lock into order, or continually reorganise itself? The museum links Seine to both Claude Monet’s studies of reflected light and Thomas Eakins’s observations of water. Kelly strips away their scenery but keeps the act of seeing.
+
+This is a recurring Kelly paradox: an image can be rigorously flat and still originate in an intensely physical experience of the world.`
+        },
+        {
+          title: "Colour becomes an object",
+          cue: "Find Red Yellow Blue White, 1952, or another multipanel colour work.",
+          minutes: "2 min",
+          text: `Find Red Yellow Blue White, made in 1952. Instead of painting coloured forms inside one rectangular canvas, Kelly separated colour into panels. The painting starts to behave like a group of objects attached to the wall.
+
+This move sounds simple, but it changes the old idea of a painting as a window onto another world. There is no illusionistic space to enter. Colour, proportion, edge, and the actual wall are the event.
+
+The title refuses metaphor. It simply names what is there. Yet the experience is not cold. Notice whether one colour advances and another recedes, how the sequence changes as you walk past it, and whether the white panel merges with the wall or remains visibly distinct.
+
+Kelly once explained his goal as making a work that was “an object, unsigned, anonymous.” That wish for anonymity separated the work from the heroic personality associated with Abstract Expressionism. Still, the choices are exact and highly particular. Impersonal does not mean careless.
+
+Move a few steps sideways. The work changes because your position and the surrounding architecture change. For Kelly, the wall is not neutral background. It completes the composition.`
+        },
+        {
+          title: "Kelly in Philadelphia",
+          cue: "Finish near the centre of the gallery and look at several works together.",
+          minutes: "2 min",
+          text: `End in the centre of the gallery. Kelly’s connection to Philadelphia extends beyond this room. In 1957 he received his first public commission, Sculpture for a Large Wall, for the Transportation Building at Penn Center. The enormous arrangement of coloured aluminium panels is now at the Museum of Modern Art in New York. Nearby in Philadelphia, Barnes Totem stands at the Barnes Foundation, and Kelly’s steel Curve I is installed in this museum’s sculpture garden.
+
+Across painting, drawing, and sculpture, he kept returning to a few questions. When does a shape stop representing something and become a thing in itself? How does a coloured form alter the wall around it? How little can an artist provide while still making vision feel newly alert?
+
+The art historian Yve-Alain Bois described Kelly’s project as an effort to make the viewer perceive rather than recognise. You do not need to decode a hidden symbol. The task is slower and more direct: compare edges, weights, intervals, and the way one colour changes another.
+
+Before leaving, choose the work that seemed simplest when you entered. Give it twenty seconds without naming what it resembles. Follow its perimeter with your eyes. Notice where the edge accelerates, pauses, or changes direction, and where the wall seems to press back.
+
+Kelly’s restraint can look effortless, but it places unusual responsibility on the viewer. The work does not tell you what to feel. It asks whether ordinary seeing—of water, a window, a plant, a shadow, a patch of colour—can be enough.`
+        }
+      ];
+
+      var guides = {
+        twombly: {
+          eyebrow: "Philadelphia Museum of Art · Modern & Contemporary Art",
+          title: "<em>Fifty Days at Iliam</em>",
+          meta: "Cy Twombly, 1978 · Six stops · About 13 minutes",
+          tracks: twomblyTracks,
+          sources: '<li><a href="https://www.philamuseum.org/objects/85709" target="_blank" rel="noreferrer">Philadelphia Museum of Art collection record</a> and exhibition texts for <em>Fifty Days at Iliam</em>.</li><li>Homer, <a href="https://www.gutenberg.org/files/6130/6130-h/6130-h.htm" target="_blank" rel="noreferrer"><em>The Iliad</em>, translated by Alexander Pope</a>, 1715–1720. Public domain.</li><li>Cy Twombly, 1957 statement reproduced by the <a href="https://cytwombly.org/news/exhibitions/cy-twombly-at-gagosian-new-york/" target="_blank" rel="noreferrer">Cy Twombly Foundation</a>.</li><li>Roland Barthes, <a href="https://cytwombly.org/artist/bibliography/monographs/cy-twombly-by-roland-barthes/" target="_blank" rel="noreferrer">“The Wisdom of Art”</a>, 1979. Brief quotation used under fair use.</li><li>Donald Judd, review of Twombly’s 1964 exhibition. Brief quotation used under fair use.</li><li>Emily Greenwood and Richard Fletcher, essays in <a href="https://www.philamuseum.org/publications/cy-twombly-fifty-days-at-iliam" target="_blank" rel="noreferrer"><em>Cy Twombly: Fifty Days at Iliam</em></a>, 2018.</li>'
+        },
+        kelly: {
+          eyebrow: "Philadelphia Museum of Art · Gallery 275",
+          title: "Ellsworth Kelly",
+          meta: "Early work and lasting ideas · Five stops · About 11 minutes",
+          tracks: kellyTracks,
+          sources: '<li><a href="https://press.philamuseum.org/museum-receives-major-gift-of-eighteen-drawings-an-early-painting-and-a-steel-sculpture-by-ellsworth-kelly/" target="_blank" rel="noreferrer">Philadelphia Museum of Art: the Kelly gift and permanent Gallery 275</a>.</li><li><a href="https://www.philamuseum.org/exhibitions/ellsworth-kelly-reflection-on-water-and-other-early-drawings" target="_blank" rel="noreferrer">Philadelphia Museum of Art: <em>Reflection on Water and Other Early Drawings</em></a>.</li><li><a href="https://www.philamuseum.org/exhibitions/ellsworth-kelly-in-resonance-selections-from-the-collection" target="_blank" rel="noreferrer">Philadelphia Museum of Art: <em>Ellsworth Kelly in Resonance</em></a>.</li><li><a href="https://press.moma.org/wp-content/uploads/2020/11/Degree-Zero_-Extended-label-copy_revised-11.24.20.pdf" target="_blank" rel="noreferrer">Museum of Modern Art, <em>Degree Zero: Drawing at Midcentury</em></a>. Brief Kelly quotation used under fair use.</li><li><a href="https://www.barnesfoundation.org/whats-on/ellsworth-kelly" target="_blank" rel="noreferrer">Barnes Foundation: Ellsworth Kelly</a>.</li><li><a href="https://whyy.org/articles/philly-art-museum-ellsworth-kelly/" target="_blank" rel="noreferrer">WHYY: Kelly’s Philadelphia connections</a>.</li>'
+        }
+      };
+      var guideId = localStorage.getItem("museumGuideId") || "twombly";
+      if (!guides[guideId]) guideId = "twombly";
+      var tracks = guides[guideId].tracks;
+
       var list = root.querySelector("#tg-tracks");
       var title = root.querySelector("#tg-title");
       var cue = root.querySelector("#tg-cue");
@@ -951,8 +1055,13 @@ When you are ready, leave the room without replaying anything. The best test of 
       var time = root.querySelector("#tg-time");
       var bar = root.querySelector("#tg-progress");
       var progressShell = root.querySelector("[role='progressbar']");
-      var current = Number(localStorage.getItem("twomblyGuideTrack") || 0);
-      var spokenIndex = Number(localStorage.getItem("twomblyGuideChar") || 0);
+      var guideTitle = root.querySelector("#tg-guide-title");
+      var guideMeta = root.querySelector("#tg-guide-meta");
+      var guideEyebrow = root.querySelector("#tg-eyebrow");
+      var sources = root.querySelector("#tg-sources");
+      var support = root.querySelector("#tg-support");
+      var current = Number(localStorage.getItem("museumGuideTrack-" + guideId) || 0);
+      var spokenIndex = Number(localStorage.getItem("museumGuideChar-" + guideId) || 0);
       var utterance = null;
       var availableVoices = [];
       var speechQueue = [];
@@ -986,7 +1095,16 @@ When you are ready, leave the room without replaying anything. The best test of 
       }
 
       function renderCurrent() {
+        var guide = guides[guideId];
         var track = tracks[current];
+        guideEyebrow.textContent = guide.eyebrow;
+        guideTitle.innerHTML = guide.title;
+        guideMeta.textContent = guide.meta;
+        sources.innerHTML = guide.sources;
+        support.textContent = "Press play once and the guide continues through all " + tracks.length + " stops. Audio uses the voice built into your phone. Keep this page open while listening; progress is remembered on this device.";
+        root.querySelectorAll(".gallery-choice").forEach(function (button) {
+          button.setAttribute("aria-current", button.getAttribute("data-guide") === guideId ? "true" : "false");
+        });
         stop.textContent = "Stop " + (current + 1) + " of " + tracks.length;
         title.textContent = track.title;
         cue.textContent = track.cue;
@@ -1008,8 +1126,8 @@ When you are ready, leave the room without replaying anything. The best test of 
         iconButton(play, "play", spokenIndex > 0 ? "Resume guide" : "Play guide");
         status.textContent = spokenIndex > 0 ? "Paused" : "Ready";
         if (savePosition) {
-          localStorage.setItem("twomblyGuideTrack", String(current));
-          localStorage.setItem("twomblyGuideChar", String(spokenIndex));
+          localStorage.setItem("museumGuideTrack-" + guideId, String(current));
+          localStorage.setItem("museumGuideChar-" + guideId, String(spokenIndex));
         }
       }
 
@@ -1058,8 +1176,8 @@ When you are ready, leave the room without replaying anything. The best test of 
         var pct = Math.min(100, Math.round((spokenIndex / track.text.length) * 100));
         bar.style.width = pct + "%";
         progressShell.setAttribute("aria-valuenow", String(pct));
-        localStorage.setItem("twomblyGuideTrack", String(current));
-        localStorage.setItem("twomblyGuideChar", String(spokenIndex));
+        localStorage.setItem("museumGuideTrack-" + guideId, String(current));
+        localStorage.setItem("museumGuideChar-" + guideId, String(spokenIndex));
       }
 
       function speakQueuedChunk() {
@@ -1076,7 +1194,7 @@ When you are ready, leave the room without replaying anything. The best test of 
           } else {
             playing = false;
             spokenIndex = 0;
-            localStorage.setItem("twomblyGuideChar", "0");
+            localStorage.setItem("museumGuideChar-" + guideId, "0");
             status.textContent = "Finished";
             iconButton(play, "rotate-ccw", "Replay guide");
           }
@@ -1112,8 +1230,8 @@ When you are ready, leave the room without replaying anything. The best test of 
         stopSpeech(false);
         current = index;
         spokenIndex = 0;
-        localStorage.setItem("twomblyGuideTrack", String(current));
-        localStorage.setItem("twomblyGuideChar", "0");
+        localStorage.setItem("museumGuideTrack-" + guideId, String(current));
+        localStorage.setItem("museumGuideChar-" + guideId, "0");
         renderCurrent();
         if (autoPlay) beginSpeech();
       }
@@ -1141,6 +1259,23 @@ When you are ready, leave the room without replaying anything. The best test of 
           stopSpeech(true);
           beginSpeech();
         }
+      });
+
+      root.querySelectorAll(".gallery-choice").forEach(function (button) {
+        button.addEventListener("click", function () {
+          var nextGuideId = button.getAttribute("data-guide");
+          if (nextGuideId === guideId || !guides[nextGuideId]) return;
+          stopSpeech(true);
+          guideId = nextGuideId;
+          tracks = guides[guideId].tracks;
+          current = Number(localStorage.getItem("museumGuideTrack-" + guideId) || 0);
+          spokenIndex = Number(localStorage.getItem("museumGuideChar-" + guideId) || 0);
+          if (!Number.isFinite(current) || current < 0 || current >= tracks.length) current = 0;
+          if (!Number.isFinite(spokenIndex) || spokenIndex < 0) spokenIndex = 0;
+          localStorage.setItem("museumGuideId", guideId);
+          renderCurrent();
+          root.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
       });
 
       function voiceScore(voice) {
