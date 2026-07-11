@@ -741,7 +741,7 @@ svg {
   <header class="guide-head">
     <div class="eyebrow text-small">Philadelphia Museum of Art · Gallery 185</div>
     <h2><em>Fifty Days at Iliam</em></h2>
-    <p>Cy Twombly, 1978 · Six stops · About 12 minutes</p>
+    <p>Cy Twombly, 1978 · Six stops · About 13 minutes</p>
   </header>
 
   <div class="card now-playing" aria-live="polite">
@@ -770,7 +770,7 @@ svg {
       </label>
       <label class="voice-field text-small" for="tg-voice">Voice
         <select id="tg-voice" class="form-select" aria-label="Narrator voice">
-          <option value="">Best available voice</option>
+          <option value="">Best available British voice</option>
         </select>
       </label>
     </div>
@@ -804,12 +804,16 @@ svg {
         {
           title: "At the threshold",
           cue: "Pause just before entering the room.",
-          minutes: "2 min",
+          minutes: "3 min",
           text: `Before you enter, one warning: this room may initially look ridiculous. Ten very large canvases, much of them nearly empty, covered with scribbled names, rough loops, clouds, smears, and paint that sometimes looks barely controlled. If your first thought is, “My kid could do that,” you are joining a long argument, not failing an art-history test.
 
 In 1964, the artist Donald Judd reviewed an exhibition by Cy Twombly and called it “a fiasco.” He said the paintings had “nothing to them.” Other writers, including Roland Barthes and Anne Carson, later regarded Twombly as one of the most compelling painters of language, memory, and gesture.
 
-Twombly was born in Virginia in 1928, but he spent much of his adult life in Italy. Classical stories were not remote museum pieces for him. He once said of the Mediterranean world, “Nothing that’s living is old to me.”
+So where does Twombly fit? He belonged to the generation of American artists that came immediately after Abstract Expressionism, the movement associated with Jackson Pollock and Willem de Kooning. Those painters treated the canvas as a place where the physical act of painting could become the subject. Twombly kept that emphasis on gesture, but made it quieter, stranger, and more literary. His lines can resemble handwriting, graffiti, a nervous doodle, or a half-erased note. Instead of presenting a single clear image, he lets marks hover between drawing and writing.
+
+Twombly studied at Black Mountain College in North Carolina, where experimental artists, musicians, and poets worked alongside one another. His early circle included Robert Rauschenberg and Jasper Johns, but Twombly followed a different path. In 1957 he settled in Rome and began joining American postwar abstraction to the poetry, ruins, and mythology of the Mediterranean. He was not trying to revive classical painting. He treated the ancient past as something fragmentary and emotionally alive: a name remembered, a line of poetry copied down, or a story resurfacing imperfectly.
+
+Twombly was born in Virginia in 1928 and spent much of his adult life in Italy. Classical stories were not remote museum pieces for him. He once said of the Mediterranean world, “Nothing that’s living is old to me.”
 
 He completed these ten paintings in 1978 after becoming absorbed in Alexander Pope’s eighteenth-century translation of Homer’s Iliad. The Iliad does not tell the whole Trojan War. It drops us into a short span near the end, when a personal quarrel, a friend’s death, and one warrior’s rage turn the war toward catastrophe.
 
@@ -1143,8 +1147,8 @@ When you are ready, leave the room without replaying anything. The best test of 
         var name = voice.name.toLowerCase();
         var score = 0;
         if (/natural|enhanced|premium|siri/.test(name)) score += 100;
-        if (/ava|samantha|aria|jenny|guy|google us english/.test(name)) score += 45;
-        if (/en-us/i.test(voice.lang)) score += 20;
+        if (/serena|martha|daniel|arthur|sonia|ryan|libby|maisie|amy/.test(name)) score += 55;
+        if (/en-gb/i.test(voice.lang)) score += 70;
         else if (/^en/i.test(voice.lang)) score += 10;
         if (voice.default) score += 5;
         return score;
