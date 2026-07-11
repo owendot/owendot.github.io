@@ -709,6 +709,8 @@ svg {
     #twombly-guide .primary-play { min-width: 8.25rem; justify-content: center; }
     #twombly-guide .speed-field { display: inline-flex; align-items: center; gap: 0.4rem; margin-left: auto; }
     #twombly-guide .speed-field .form-select { width: auto; }
+    #twombly-guide .voice-field { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 0.5rem; flex-basis: 100%; }
+    #twombly-guide .voice-field .form-select { width: 100%; }
     #twombly-guide .track-list { display: grid; gap: 0.4rem; margin: 0 0 1rem; padding: 0; list-style: none; }
     #twombly-guide .track { width: 100%; display: grid; grid-template-columns: 2rem minmax(0, 1fr) auto; gap: 0.65rem; align-items: center; text-align: left; }
     #twombly-guide .track-number { color: var(--muted-foreground); }
@@ -731,6 +733,7 @@ svg {
       #twombly-guide .transport .btn { justify-content: center; }
       #twombly-guide .primary-play { grid-column: 1 / -1; width: 100%; }
       #twombly-guide .speed-field { grid-column: 1 / -1; margin-left: 0; justify-content: space-between; }
+      #twombly-guide .voice-field { grid-column: 1 / -1; }
       #twombly-guide .track { grid-template-columns: 1.6rem minmax(0, 1fr) auto; }
     }
   </style>
@@ -763,6 +766,11 @@ svg {
           <option value="1" selected>1×</option>
           <option value="1.1">1.1×</option>
           <option value="1.25">1.25×</option>
+        </select>
+      </label>
+      <label class="voice-field text-small" for="tg-voice">Voice
+        <select id="tg-voice" class="form-select" aria-label="Narrator voice">
+          <option value="">Best available voice</option>
         </select>
       </label>
     </div>
@@ -934,6 +942,7 @@ When you are ready, leave the room without replaying anything. The best test of 
       var prev = root.querySelector("#tg-prev");
       var next = root.querySelector("#tg-next");
       var speed = root.querySelector("#tg-speed");
+      var voiceSelect = root.querySelector("#tg-voice");
       var status = root.querySelector("#tg-status");
       var time = root.querySelector("#tg-time");
       var bar = root.querySelector("#tg-progress");
@@ -941,6 +950,7 @@ When you are ready, leave the room without replaying anything. The best test of 
       var current = Number(localStorage.getItem("twomblyGuideTrack") || 0);
       var spokenIndex = Number(localStorage.getItem("twomblyGuideChar") || 0);
       var utterance = null;
+      var availableVoices = [];
       var speechQueue = [];
       var queueIndex = 0;
       var playing = false;
@@ -1004,6 +1014,7 @@ When you are ready, leave the room without replaying anything. The best test of 
           status.textContent = "Audio is not supported in this browser";
           return;
         }
+        if (!availableVoices.length) loadVoices();
         window.speechSynthesis.cancel();
         var track = tracks[current];
         if (!track.text.slice(spokenIndex).trim()) {
@@ -1070,6 +1081,8 @@ When you are ready, leave the room without replaying anything. The best test of 
         utterance = new SpeechSynthesisUtterance(chunk.text);
         utterance.rate = Number(speed.value);
         utterance.pitch = 1;
+        var selectedVoice = availableVoices.find(function (voice) { return voice.name === voiceSelect.value; });
+        if (selectedVoice) utterance.voice = selectedVoice;
         utterance.onboundary = function (event) {
           if (typeof event.charIndex === "number") {
             spokenIndex = Math.min(track.text.length, chunk.start + event.charIndex);
@@ -1118,8 +1131,45 @@ When you are ready, leave the room without replaying anything. The best test of 
           beginSpeech();
         }
       });
+      voiceSelect.addEventListener("change", function () {
+        localStorage.setItem("twomblyGuideVoice", voiceSelect.value);
+        if (playing) {
+          stopSpeech(true);
+          beginSpeech();
+        }
+      });
+
+      function voiceScore(voice) {
+        var name = voice.name.toLowerCase();
+        var score = 0;
+        if (/natural|enhanced|premium|siri/.test(name)) score += 100;
+        if (/ava|samantha|aria|jenny|guy|google us english/.test(name)) score += 45;
+        if (/en-us/i.test(voice.lang)) score += 20;
+        else if (/^en/i.test(voice.lang)) score += 10;
+        if (voice.default) score += 5;
+        return score;
+      }
+
+      function loadVoices() {
+        if (!("speechSynthesis" in window)) return;
+        availableVoices = window.speechSynthesis.getVoices().filter(function (voice) { return /^en/i.test(voice.lang); });
+        availableVoices.sort(function (a, b) { return voiceScore(b) - voiceScore(a) || a.name.localeCompare(b.name); });
+        if (!availableVoices.length) return;
+        var savedVoice = localStorage.getItem("twomblyGuideVoice");
+        var preferred = availableVoices.find(function (voice) { return voice.name === savedVoice; }) || availableVoices[0];
+        voiceSelect.innerHTML = "";
+        availableVoices.forEach(function (voice) {
+          var option = document.createElement("option");
+          option.value = voice.name;
+          option.textContent = voice.name + " (" + voice.lang + ")";
+          voiceSelect.appendChild(option);
+        });
+        voiceSelect.value = preferred.name;
+      }
       var savedSpeed = localStorage.getItem("twomblyGuideSpeed");
       if (savedSpeed && root.querySelector('#tg-speed option[value="' + savedSpeed + '"]')) speed.value = savedSpeed;
+      loadVoices();
+      if ("speechSynthesis" in window) window.speechSynthesis.onvoiceschanged = loadVoices;
       renderCurrent();
     })();
   </script>
